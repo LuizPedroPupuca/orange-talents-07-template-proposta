@@ -1,5 +1,7 @@
 package com.zupacademy.luizpedro.microserviceproposta.model;
 
+import com.zupacademy.luizpedro.microserviceproposta.dto.ResultadoAnalise;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
@@ -24,6 +26,9 @@ public class Proposta {
     @Column(nullable = false)
     private BigDecimal salario;
 
+    @Enumerated(EnumType.STRING)
+    private StatusResultado statusResultado;
+
     @Deprecated
     public Proposta(){}
 
@@ -33,9 +38,24 @@ public class Proposta {
         this.nome = nome;
         this.endereco = endereco;
         this.salario = salario;
+        this.statusResultado = StatusResultado.NAO_ELEGIVEL;
     }
+
+
 
     public Long getId() {
         return id;
+    }
+
+    public String getDocumento() {
+        return documento;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void atualizaStatus(Status status) {
+        this.statusResultado = status.getStatusResultado();
     }
 }
