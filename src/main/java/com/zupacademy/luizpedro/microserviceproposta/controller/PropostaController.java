@@ -43,7 +43,6 @@ public class PropostaController {
             try{
                 SolicitacaoAnalise solicitacaoAnalise = new SolicitacaoAnalise(proposta);
                 ResultadoAnalise resultadoAnalise = analiseFinanceira.consultaDados(solicitacaoAnalise);
-                System.out.println(resultadoAnalise);
                 System.out.println(resultadoAnalise.toString());
                 proposta.atualizaStatus(resultadoAnalise.getResultadoSolicitacao());
                 System.out.println();
