@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------------
+Test set: com.zupacademy.luizpedro.microserviceproposta.MicroservicePropostaApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 11.43 s <<< FAILURE! - in com.zupacademy.luizpedro.microserviceproposta.MicroservicePropostaApplicationTests
+contextLoads  Time elapsed: 0.002 s  <<< ERROR!
+java.lang.IllegalStateException: Failed to load ApplicationContext
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'propostaController': Unsatisfied dependency expressed through field 'analiseFinanceira'; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'com.zupacademy.luizpedro.microserviceproposta.controller.AnaliseFinanceira': Unexpected exception during bean creation; nested exception is java.lang.NoClassDefFoundError: org/springframework/cloud/openfeign/ribbon/LoadBalancerFeignClient
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'com.zupacademy.luizpedro.microserviceproposta.controller.AnaliseFinanceira': Unexpected exception during bean creation; nested exception is java.lang.NoClassDefFoundError: org/springframework/cloud/openfeign/ribbon/LoadBalancerFeignClient
+Caused by: java.lang.NoClassDefFoundError: org/springframework/cloud/openfeign/ribbon/LoadBalancerFeignClient
+Caused by: java.lang.ClassNotFoundException: org.springframework.cloud.openfeign.ribbon.LoadBalancerFeignClient
+

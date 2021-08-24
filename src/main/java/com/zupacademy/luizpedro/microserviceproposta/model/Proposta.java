@@ -29,6 +29,9 @@ public class Proposta {
     @Enumerated(EnumType.STRING)
     private StatusResultado statusResultado;
 
+    @OneToOne(cascade = {CascadeType.MERGE})
+    private Cartao cartao;
+
     @Deprecated
     public Proposta(){}
 
@@ -41,8 +44,6 @@ public class Proposta {
         this.statusResultado = StatusResultado.NAO_ELEGIVEL;
     }
 
-
-
     public Long getId() {
         return id;
     }
@@ -51,11 +52,36 @@ public class Proposta {
         return documento;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public String getNome() {
         return nome;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public BigDecimal getSalario() {
+        return salario;
+    }
+
+    public StatusResultado getStatusResultado() {
+        return statusResultado;
+    }
+
+    public Cartao getCartao() {
+        return cartao;
+    }
+
+    public void associaCartao(Cartao cartao) {
+        this.cartao = cartao;
     }
 
     public void atualizaStatus(Status status) {
         this.statusResultado = status.getStatusResultado();
     }
+
 }
