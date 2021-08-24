@@ -28,4 +28,20 @@ public class Cartao {
         this.titular = titular;
         this.limite = limite;
     }
+
+    public String getNumeroCartao() {
+        return numeroCartao;
+    }
+
+    public LocalDateTime getEmitidoEm() {
+        return emitidoEm;
+    }
+
+    public String getTitular() {
+        return titular;
+    }
+
+    public BigDecimal getLimite() {
+        return limite;
+    }
 }

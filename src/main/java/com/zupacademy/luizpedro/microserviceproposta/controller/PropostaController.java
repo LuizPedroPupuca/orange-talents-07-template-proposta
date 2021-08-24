@@ -1,13 +1,16 @@
 package com.zupacademy.luizpedro.microserviceproposta.controller;
 
 import com.zupacademy.luizpedro.microserviceproposta.dto.PropostaRequest;
+import com.zupacademy.luizpedro.microserviceproposta.dto.PropostaResponse;
 import com.zupacademy.luizpedro.microserviceproposta.dto.ResultadoAnalise;
 import com.zupacademy.luizpedro.microserviceproposta.dto.SolicitacaoAnalise;
 import com.zupacademy.luizpedro.microserviceproposta.model.Proposta;
 import com.zupacademy.luizpedro.microserviceproposta.model.Status;
 import com.zupacademy.luizpedro.microserviceproposta.repository.PropostaRepository;
 import feign.FeignException;
+import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -52,6 +55,17 @@ public class PropostaController {
             return ResponseEntity.created(uri).build();
         }
         return ResponseEntity.status(422).body("Já existe um CNPJ/CPF cadastrado");
+
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<?> consultaProposta(@PathVariable Long id){
+       Optional<Proposta> propostaOptional = propostaRepository.findById(id);
+        if(propostaOptional.isPresent()){
+            Proposta proposta = propostaOptional.get();
+            return ResponseEntity.ok().body(new PropostaResponse(proposta));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Id não encontrado");
 
     }
 
