@@ -22,16 +22,28 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
-  postgres-propostas:
+  postgres-proposta:
     image: 'postgres:9.6-alpine'
     volumes:
-      - propostas-volume:/var/lib/postgresql/data
+      - proposta-volume:/var/lib/postgresql/data
     ports:
       - 5433:5432 # porta_maquia_host:porta_do_container_do_docker
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: LuizPedro@1980
-      POSTGRES_DB: propostas
+      POSTGRES_DB: proposta
+
+  proposta-webservice:
+      image: luizpedro/proposta
+      ports:
+        - 8081:8080
+      environment:
+        PROFILE: prod
+        URL_DATABASE: jdbc:postgresql://postgres-proposta:5432/proposta
+      depends_on:
+        - postgres-proposta
+        - analise
+        - contas
 
   postgres:
     image: 'postgres:9.6-alpine'
@@ -149,4 +161,4 @@ volumes:
   grafana-volume:
   prometheus-volume:
   postgres-volume:
-  propostas-volume:
+  proposta-volume:
