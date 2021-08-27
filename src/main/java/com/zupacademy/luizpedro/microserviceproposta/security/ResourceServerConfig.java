@@ -1,4 +1,4 @@
-package com.zupacademy.luizpedro.microserviceproposta;
+package com.zupacademy.luizpedro.microserviceproposta.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,7 +17,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("SCOPE_escopo-proposta")
                 .antMatchers(HttpMethod.GET,"proposta/**")
                 .hasAnyAuthority("SCOPE_escopo-proposta")
-                .antMatchers(HttpMethod.GET,"cartao/**")
+                .antMatchers(HttpMethod.GET,"cartoes/**")
                 .hasAnyAuthority("SCOPE_escopo-proposta")
                 .anyRequest().authenticated()).oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
 

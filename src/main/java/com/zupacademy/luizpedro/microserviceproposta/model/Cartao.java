@@ -18,6 +18,8 @@ public class Cartao {
 
     private BigDecimal limite;
 
+    private StatusCartao status;
+
 
     @Deprecated
     public Cartao(){}
@@ -27,6 +29,7 @@ public class Cartao {
         this.emitidoEm = emitidoEm;
         this.titular = titular;
         this.limite = limite;
+        this.status = StatusCartao.ativo;
     }
 
     public String getNumeroCartao() {
@@ -43,5 +46,13 @@ public class Cartao {
 
     public BigDecimal getLimite() {
         return limite;
+    }
+
+    public StatusCartao getStatus() {
+        return status;
+    }
+
+    public void bloqueioCartao(){
+        this.status = StatusCartao.bloqueado;
     }
 }
