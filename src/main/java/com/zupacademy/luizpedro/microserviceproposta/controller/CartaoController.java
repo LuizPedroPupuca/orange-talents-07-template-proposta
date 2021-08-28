@@ -1,11 +1,10 @@
 package com.zupacademy.luizpedro.microserviceproposta.controller;
 
+import com.zupacademy.luizpedro.microserviceproposta.dto.AvisoDeViagemRequest;
 import com.zupacademy.luizpedro.microserviceproposta.dto.BiometriaRequest;
 import com.zupacademy.luizpedro.microserviceproposta.dto.BloqueioRequest;
-import com.zupacademy.luizpedro.microserviceproposta.model.Biometria;
-import com.zupacademy.luizpedro.microserviceproposta.model.Bloqueio;
-import com.zupacademy.luizpedro.microserviceproposta.model.Cartao;
-import com.zupacademy.luizpedro.microserviceproposta.model.StatusCartao;
+import com.zupacademy.luizpedro.microserviceproposta.model.*;
+import com.zupacademy.luizpedro.microserviceproposta.repository.AvisoDeViagemRepository;
 import com.zupacademy.luizpedro.microserviceproposta.repository.BiometriaRepository;
 import com.zupacademy.luizpedro.microserviceproposta.repository.BloqueioRepository;
 import com.zupacademy.luizpedro.microserviceproposta.repository.CartaoRepository;
@@ -36,18 +35,20 @@ public class CartaoController {
     private BloqueioRepository bloqueioRepository;
 
     @Autowired
-    private CartoesClient cartoesClient;
+    private AvisoDeViagemRepository avisoDeViagemRepository;
 
+    @Autowired
+    private CartoesClient cartoesClient;
 
 
     @PostMapping("/{idCartao}/biometria")
     @Transactional
     public ResponseEntity<?> cadastraCartao(@PathVariable Long idCartao, @RequestBody @Valid BiometriaRequest biometriaRequest,
-                                            UriComponentsBuilder builder){
+                                            UriComponentsBuilder builder) {
 
         Optional<Cartao> cartaoOptional = cartaoRepository.findById(idCartao);
 
-        if(cartaoOptional.isEmpty()){
+        if (cartaoOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cartão não encontrado");
         }
 
@@ -59,31 +60,30 @@ public class CartaoController {
 
     @PostMapping("/{numeroCartao}/bloqueios")
     @Transactional
-    public ResponseEntity<?> bloqueiaCartao(@PathVariable String numeroCartao, HttpServletRequest request,
-                                            UriComponentsBuilder builder){
+    public ResponseEntity<?> bloqueiaCartao(@PathVariable String numeroCartao, HttpServletRequest request) {
 
         Optional<Cartao> cartaoOptional = cartaoRepository.findByNumeroCartao(numeroCartao);
 
         String userClient = request.getHeader("User-Agent");
         String ipClient = request.getHeader("X-FORWARDED-FOR");
-        if(ipClient == null)
+        if (ipClient == null)
             ipClient = request.getRemoteAddr();
 
-        if(cartaoOptional.isEmpty()){
+        if (cartaoOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cartão não encontrado");
         }
 
         Cartao cartao = cartaoOptional.get();
-        if(cartao.getStatus() == StatusCartao.bloqueado){
+        if (cartao.getStatus() == StatusCartao.bloqueado) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
 
         Bloqueio bloqueio = new Bloqueio(ipClient, userClient, cartao);
         try {
             BloqueioRequest bloqueioRequest = new BloqueioRequest("Proposta");
-            cartoesClient.bloqueiaCartao(numeroCartao,bloqueioRequest);
-        }catch (FeignException e){
-            System.out.println("excecao: "+e);
+            cartoesClient.bloqueiaCartao(numeroCartao, bloqueioRequest);
+        } catch (FeignException e) {
+            System.out.println("excecao: " + e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
@@ -93,4 +93,31 @@ public class CartaoController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{numeroCartao}/avisos")
+    @Transactional
+    public ResponseEntity<?> associaAvisoDeViagemCartao(@PathVariable String numeroCartao, HttpServletRequest request,
+                                                 @RequestBody AvisoDeViagemRequest avisoDeViagemRequest) {
+
+        Optional<Cartao> cartaoOptional = cartaoRepository.findByNumeroCartao(numeroCartao);
+
+        if (cartaoOptional.isEmpty()) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND);
+        }
+
+        String userClient = request.getHeader("User-Agent");
+        String ipClient = request.getHeader("X-FORWARDED-FOR");
+        if (ipClient == null) {
+            ipClient = request.getRemoteAddr();
+        }
+
+        Cartao cartao = cartaoOptional.get();
+
+        AvisoDeViagem avisoDeViagem = avisoDeViagemRequest.toModel(cartao,
+                ipClient, userClient);
+
+        avisoDeViagemRepository.save(avisoDeViagem);
+        return ResponseEntity.ok().body("Aviso de viagem cadastrado com sucesso");
+    }
+
 }
