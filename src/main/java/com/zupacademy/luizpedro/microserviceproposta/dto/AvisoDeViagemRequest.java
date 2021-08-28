@@ -38,4 +38,11 @@ public class AvisoDeViagemRequest {
         return new AvisoDeViagem(cartao, destino, termino, ipClient, userAgent);
     }
 
+    public String getDestino() {
+        return destino;
+    }
+
+    public LocalDate getTermino() {
+        return termino;
+    }
 }

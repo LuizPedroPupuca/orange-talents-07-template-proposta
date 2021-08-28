@@ -1,8 +1,6 @@
 package com.zupacademy.luizpedro.microserviceproposta.controller;
 
-import com.zupacademy.luizpedro.microserviceproposta.dto.AvisoDeViagemRequest;
-import com.zupacademy.luizpedro.microserviceproposta.dto.BiometriaRequest;
-import com.zupacademy.luizpedro.microserviceproposta.dto.BloqueioRequest;
+import com.zupacademy.luizpedro.microserviceproposta.dto.*;
 import com.zupacademy.luizpedro.microserviceproposta.model.*;
 import com.zupacademy.luizpedro.microserviceproposta.repository.AvisoDeViagemRepository;
 import com.zupacademy.luizpedro.microserviceproposta.repository.BiometriaRepository;
@@ -115,6 +113,14 @@ public class CartaoController {
 
         AvisoDeViagem avisoDeViagem = avisoDeViagemRequest.toModel(cartao,
                 ipClient, userClient);
+
+        try {
+            AvisoDeViagemApiRequest avisoDeViagemApiRequest = new AvisoDeViagemApiRequest(avisoDeViagemRequest);
+            AvisoDeViagemApiResponse avisoDeViagemApiResponse = cartoesClient.avisaViagem(numeroCartao, avisoDeViagemApiRequest);
+        } catch (FeignException e) {
+            System.out.println("excecao: " + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
 
         avisoDeViagemRepository.save(avisoDeViagem);
         return ResponseEntity.ok().body("Aviso de viagem cadastrado com sucesso");

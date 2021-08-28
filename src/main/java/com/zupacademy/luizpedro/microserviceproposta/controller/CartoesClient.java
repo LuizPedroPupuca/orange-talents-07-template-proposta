@@ -1,8 +1,6 @@
 package com.zupacademy.luizpedro.microserviceproposta.controller;
 
-import com.zupacademy.luizpedro.microserviceproposta.dto.BloqueioRequest;
-import com.zupacademy.luizpedro.microserviceproposta.dto.BloqueioResponse;
-import com.zupacademy.luizpedro.microserviceproposta.dto.CartaoApiResponse;
+import com.zupacademy.luizpedro.microserviceproposta.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,4 +11,7 @@ public interface CartoesClient {
 
     @PostMapping("${accounts.bloqueiaCartao}")
     BloqueioResponse bloqueiaCartao(@PathVariable String id, @RequestBody BloqueioRequest request);
+
+    @PostMapping("${accounts.avisaViagemCartao}")
+    AvisoDeViagemApiResponse avisaViagem(@PathVariable String id, @RequestBody AvisoDeViagemApiRequest request);
 }

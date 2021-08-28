@@ -25,6 +25,8 @@ public class AvisoDeViagem {
 
     private String userAgent;
 
+    private StatusAviso status = StatusAviso.NAO_CRIADO;
+
     @Deprecated
     public AvisoDeViagem(){}
 
