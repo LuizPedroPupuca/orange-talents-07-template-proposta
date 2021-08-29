@@ -16,7 +16,8 @@ public class CarteiraDigital {
     @ManyToOne
     private Cartao cartao;
 
-    private String emissor;
+    @Enumerated(EnumType.STRING)
+    private Emissor emissor;
 
     private String numeroCartao;
 
@@ -24,7 +25,7 @@ public class CarteiraDigital {
     @Deprecated
     public CarteiraDigital(){}
 
-    public CarteiraDigital(String email, Cartao cartao, String emissor, String numeroCartao) {
+    public CarteiraDigital(String email, Cartao cartao, Emissor emissor, String numeroCartao) {
         this.email = email;
         this.cartao = cartao;
         this.emissor = emissor;
@@ -35,7 +36,7 @@ public class CarteiraDigital {
         return id;
     }
 
-    public String getEmissor() {
+    public Emissor getEmissor() {
         return emissor;
     }
 

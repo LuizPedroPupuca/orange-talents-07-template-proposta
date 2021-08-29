@@ -1,13 +1,15 @@
 package com.zupacademy.luizpedro.microserviceproposta.dto;
 
+import com.zupacademy.luizpedro.microserviceproposta.model.Emissor;
+
 public class CarteiraDigitalApiRequest {
     private String email;
-    private String carteira;
+    private Emissor carteira;
 
     @Deprecated
     public CarteiraDigitalApiRequest(){}
 
-    public CarteiraDigitalApiRequest(String email, String carteira) {
+    public CarteiraDigitalApiRequest(String email, Emissor carteira) {
         this.email = email;
         this.carteira = carteira;
     }
@@ -16,7 +18,7 @@ public class CarteiraDigitalApiRequest {
         return email;
     }
 
-    public String getCarteira() {
+    public Emissor getCarteira() {
         return carteira;
     }
 

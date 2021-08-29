@@ -144,7 +144,7 @@ public class CartaoController {
 
         List<CarteiraDigital> carteirasDigitais = carteiraDigitalRepository.findByCartaoNumeroCartao(numeroCartao);
         for (CarteiraDigital carteiraDigital: carteirasDigitais) {
-            if (carteiraDigitalRequest.getEmissor().equals(carteiraDigital.getEmissor())){
+            if (carteiraDigital.getEmissor() == carteiraDigitalRequest.getEmissor()){
                 return ResponseEntity.unprocessableEntity().body("Já existe um número de cartão com o mesmo emissor");
             }
         }
