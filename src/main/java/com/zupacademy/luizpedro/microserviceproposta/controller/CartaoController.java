@@ -2,21 +2,20 @@ package com.zupacademy.luizpedro.microserviceproposta.controller;
 
 import com.zupacademy.luizpedro.microserviceproposta.dto.*;
 import com.zupacademy.luizpedro.microserviceproposta.model.*;
-import com.zupacademy.luizpedro.microserviceproposta.repository.AvisoDeViagemRepository;
-import com.zupacademy.luizpedro.microserviceproposta.repository.BiometriaRepository;
-import com.zupacademy.luizpedro.microserviceproposta.repository.BloqueioRepository;
-import com.zupacademy.luizpedro.microserviceproposta.repository.CartaoRepository;
+import com.zupacademy.luizpedro.microserviceproposta.repository.*;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -36,12 +35,15 @@ public class CartaoController {
     private AvisoDeViagemRepository avisoDeViagemRepository;
 
     @Autowired
+    private CarteiraDigitalRepository carteiraDigitalRepository;
+
+    @Autowired
     private CartoesClient cartoesClient;
 
 
     @PostMapping("/{idCartao}/biometria")
     @Transactional
-    public ResponseEntity<?> cadastraCartao(@PathVariable Long idCartao, @RequestBody @Valid BiometriaRequest biometriaRequest,
+    public ResponseEntity<?> cadastraBiometria(@PathVariable Long idCartao, @RequestBody @Valid BiometriaRequest biometriaRequest,
                                             UriComponentsBuilder builder) {
 
         Optional<Cartao> cartaoOptional = cartaoRepository.findById(idCartao);
@@ -124,6 +126,45 @@ public class CartaoController {
 
         avisoDeViagemRepository.save(avisoDeViagem);
         return ResponseEntity.ok().body("Aviso de viagem cadastrado com sucesso");
+    }
+
+    @PostMapping("/{numeroCartao}/carteiras")
+    @Transactional
+    public ResponseEntity associaCartaoACarteiraDigital(@PathVariable String numeroCartao,
+                                                        @RequestBody CarteiraDigitalRequest carteiraDigitalRequest,
+                                                        UriComponentsBuilder builder) {
+
+        Optional<Cartao> cartaoOptional = cartaoRepository.findByNumeroCartao(numeroCartao);
+
+        if (cartaoOptional.isEmpty()) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND);
+        }
+
+        Cartao cartao = cartaoOptional.get();
+
+        List<CarteiraDigital> carteirasDigitais = carteiraDigitalRepository.findByCartaoNumeroCartao(numeroCartao);
+        for (CarteiraDigital carteiraDigital: carteirasDigitais) {
+            if (carteiraDigitalRequest.getEmissor().equals(carteiraDigital.getEmissor())){
+                return ResponseEntity.unprocessableEntity().body("Já existe um número de cartão com o mesmo emissor");
+            }
+        }
+
+
+        CarteiraDigitalApiResponse carteiraDigitalApiResponse = null;
+        try {
+            CarteiraDigitalApiRequest carteiraDigitalApiRequest = new CarteiraDigitalApiRequest(carteiraDigitalRequest);
+            carteiraDigitalApiResponse = cartoesClient.associaCarteira(numeroCartao, carteiraDigitalApiRequest);
+            System.out.println("O número da carteira digital é "+carteiraDigitalApiResponse.getId());
+        } catch (FeignException e) {
+            System.out.println("excecao: " + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        CarteiraDigital carteiraDigital = carteiraDigitalRequest.toModel(cartao,carteiraDigitalApiResponse.getId());
+
+        carteiraDigitalRepository.save(carteiraDigital);
+        URI uri = builder.path("/carteiras/{id}").buildAndExpand(carteiraDigital.getId()).toUri();
+        return ResponseEntity.created(uri).build();
     }
 
 }
