@@ -18,6 +18,7 @@ public class Cartao {
 
     private BigDecimal limite;
 
+    @Enumerated(EnumType.STRING)
     private StatusCartao status;
 
 

@@ -8,7 +8,7 @@ import com.zupacademy.luizpedro.microserviceproposta.model.Proposta;
 import com.zupacademy.luizpedro.microserviceproposta.model.Status;
 import com.zupacademy.luizpedro.microserviceproposta.repository.PropostaRepository;
 import feign.FeignException;
-import net.bytebuddy.asm.Advice;
+import io.opentracing.Tracer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +30,15 @@ public class PropostaController {
     @Autowired
     private AnaliseFinanceira analiseFinanceira;
 
+    @Autowired
+    private Tracer tracer;
+
 
     @PostMapping
     @Transactional
     ResponseEntity<?> cadastra(@RequestBody @Valid PropostaRequest propostaRequest,
                                   UriComponentsBuilder builder){
+        tracer.activeSpan().setTag("user.email",propostaRequest.getEmail());
         Optional<Proposta> propostaOptional = propostaRepository
                 .findByDocumento(propostaRequest.getDocumento());
         if(propostaOptional.isEmpty()){

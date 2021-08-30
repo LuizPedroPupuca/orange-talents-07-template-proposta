@@ -41,4 +41,8 @@ public class PropostaRequest {
     public String getDocumento() {
         return documento;
     }
+
+    public String getEmail() {
+        return email;
+    }
 }

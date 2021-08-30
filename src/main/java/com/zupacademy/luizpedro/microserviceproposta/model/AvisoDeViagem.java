@@ -25,6 +25,7 @@ public class AvisoDeViagem {
 
     private String userAgent;
 
+    @Enumerated(EnumType.STRING)
     private StatusAviso status = StatusAviso.NAO_CRIADO;
 
     @Deprecated
