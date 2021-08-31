@@ -1,6 +1,7 @@
 package com.zupacademy.luizpedro.microserviceproposta.dto;
 
 import com.zupacademy.luizpedro.microserviceproposta.controller.validation.Documento;
+import com.zupacademy.luizpedro.microserviceproposta.controller.validation.UniqueValue;
 import com.zupacademy.luizpedro.microserviceproposta.model.Proposta;
 
 import javax.validation.constraints.Email;
@@ -14,7 +15,7 @@ public class PropostaRequest {
     @NotBlank @Documento
     private String documento;
 
-    @NotBlank @Email
+    @NotBlank @Email @UniqueValue(fieldName = "email", domainClass = Proposta.class)
     private String email;
 
     @NotBlank

@@ -12,6 +12,7 @@ import io.opentracing.Tracer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -40,24 +41,25 @@ public class PropostaController {
                                   UriComponentsBuilder builder){
         tracer.activeSpan().setTag("user.email",propostaRequest.getEmail());
         Optional<Proposta> propostaOptional = propostaRepository
-                .findByDocumento(propostaRequest.getDocumento());
-        if(propostaOptional.isEmpty()){
-            Proposta proposta = propostaRequest.toModel();
-            propostaRepository.save(proposta);
-            try{
-                SolicitacaoAnalise solicitacaoAnalise = new SolicitacaoAnalise(proposta);
-                ResultadoAnalise resultadoAnalise = analiseFinanceira.consultaDados(solicitacaoAnalise);
-                System.out.println(resultadoAnalise.toString());
-                proposta.atualizaStatus(resultadoAnalise.getResultadoSolicitacao());
-                System.out.println();
-            }catch (FeignException e){
-                proposta.atualizaStatus(Status.COM_RESTRICAO);
-            }
-            propostaRepository.save(proposta);
-            URI uri = builder.path("/proposta/{id}").buildAndExpand(proposta.getId()).toUri();
-            return ResponseEntity.created(uri).build();
+                .findByDocumento(propostaRequest.getEmail());
+        if(propostaOptional.isPresent() && BCrypt.checkpw(propostaRequest.getDocumento(), propostaOptional.get().getDocumento())){
+            return ResponseEntity.status(422).body("Já existe um CNPJ/CPF cadastrado");
         }
-        return ResponseEntity.status(422).body("Já existe um CNPJ/CPF cadastrado");
+        Proposta proposta = propostaRequest.toModel();
+        propostaRepository.save(proposta);
+        try{
+            SolicitacaoAnalise solicitacaoAnalise = new SolicitacaoAnalise(proposta);
+            ResultadoAnalise resultadoAnalise = analiseFinanceira.consultaDados(solicitacaoAnalise);
+            System.out.println(resultadoAnalise.toString());
+            proposta.atualizaStatus(resultadoAnalise.getResultadoSolicitacao());
+            System.out.println();
+        }catch (FeignException e){
+            proposta.atualizaStatus(Status.COM_RESTRICAO);
+        }
+        propostaRepository.save(proposta);
+        URI uri = builder.path("/proposta/{id}").buildAndExpand(proposta.getId()).toUri();
+        return ResponseEntity.created(uri).build();
+
 
     }
 

@@ -1,6 +1,7 @@
 package com.zupacademy.luizpedro.microserviceproposta.model;
 
 import com.zupacademy.luizpedro.microserviceproposta.dto.ResultadoAnalise;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -36,7 +37,7 @@ public class Proposta {
     public Proposta(){}
 
     public Proposta(String documento, String email, String nome, String endereco, BigDecimal salario) {
-        this.documento = documento;
+        this.documento = BCrypt.hashpw(documento, BCrypt.gensalt());
         this.email = email;
         this.nome = nome;
         this.endereco = endereco;
